@@ -7,7 +7,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, r2_score
 
-DATA_PATH = "solar_sousse_30days.xlsx"
+DATA_PATH = "solar_sousse_30days(1).xlsx"
 BEST_MODEL_PATH = "battery_best_model.joblib"
 ALL_MODELS_PATH = "battery_all_models.joblib"
 
