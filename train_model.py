@@ -7,7 +7,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, r2_score
 
-DATA_PATH = "solar_sousse_30days.xlsx"
+DATA_PATH = "solar_sousse_30days(1).xlsx"
 BEST_MODEL_PATH = "battery_best_model.joblib"
 ALL_MODELS_PATH = "battery_all_models.joblib"
 
@@ -17,12 +17,12 @@ def load_and_preprocess_data(path: str) -> pd.DataFrame:
     df["time_h"] = pd.to_datetime(df["time_h"], errors="coerce")
     df["hour"] = df["time_h"].dt.hour
     df["dayofyear"] = df["time_h"].dt.dayofyear
-
     return df
 
 
 def train_and_compare():
     df = load_and_preprocess_data(DATA_PATH)
+
     feature_cols = [
         "irradiance_Wm2",
         "solar_power_W",
@@ -34,9 +34,11 @@ def train_and_compare():
 
     X = df[feature_cols]
     y = df[target_col]
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
+
     models = {
         "random_forest": RandomForestRegressor(
             n_estimators=300, random_state=42, n_jobs=-1
@@ -53,19 +55,21 @@ def train_and_compare():
     results = {}
     best_r2 = -999
     best_name = None
+
     for name, model in models.items():
         print(f"\nTraining {name}...")
         model.fit(X_train, y_train)
+
         y_pred = model.predict(X_test)
         mae = mean_absolute_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
+
         results[name] = {"model": model, "mae": mae, "r2": r2}
         print(f"{name}: MAE = {mae:.3f} | R² = {r2:.3f}")
 
         if r2 > best_r2:
             best_r2 = r2
             best_name = name
-
     joblib.dump(
         {
             "models": {n: r["model"] for n, r in results.items()},
@@ -75,7 +79,7 @@ def train_and_compare():
         },
         ALL_MODELS_PATH,
     )
-    print(f"models saved  {ALL_MODELS_PATH}")
+    print(f"models saved to {ALL_MODELS_PATH}")
     joblib.dump(
         {
             "model": results[best_name]["model"],
@@ -84,7 +88,7 @@ def train_and_compare():
         },
         BEST_MODEL_PATH,
     )
-    print(f"best model saved {BEST_MODEL_PATH}")
+    print(f"best model saved to {BEST_MODEL_PATH}")
 
 
 if __name__ == "__main__":
